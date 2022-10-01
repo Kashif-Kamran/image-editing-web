@@ -3,15 +3,10 @@ let previewImg = document.querySelector(".preview-img img");
 let fileInputDioBox = document.querySelector(".file-input");
 let chooseFileButton = document.querySelector(".choose-img");
 
-let editingOptions = document.querySelectorAll(".options button")
-
+let editingOptions = document.querySelectorAll(".filter .options button")
+let rotationalOptions = document.querySelectorAll(".rotate .options button")
 
 let resetBtn = document.querySelector(".reset-filter")
-let antiClockRotateBtn = document.querySelector("#left");
-let clockRotateBtn = document.querySelector("#right");
-let upsideDownRotateBtn = document.querySelector("#vertical");
-let mirrorBtn = document.querySelector("#horizontal");
-
 // ---------------- Slider Selection ------------------/
 let slider = document.querySelector(".slider input")
 let filterName = document.querySelector(".filter-info .name");
@@ -26,14 +21,26 @@ let properties = {
     "Saturation": 100,
     "Grayscale": 0,
     "Inversion": 0,
-    "RotationAngle": 0
+    "RotationAngle": 0,
+
+}
+function resetProperties()
+{
+    properties["Brightness"] = 100;
+    properties["Saturation"] = 100;
+    properties["Grayscale"] = 0;
+    properties["Inversion"] = 0;
+    properties["RotationAngle"] = 0;
+    changeSliderHeadings(activeProperty,properties[activeProperty])
+    updateImgColorProperties()
 }
 // Changing Image Properties
 
 function updateImgColorProperties()
 {
     let filterString = "brightness(" + properties["Brightness"] + "%) saturate(" + properties["Saturation"] + "%) grayscale(" + properties["Grayscale"] + "%) invert(" + properties["Inversion"] + "%)"
-    document.querySelector(".preview-img img").style.filter = filterString;
+    previewImg.style.filter = filterString;
+    previewImg.style.transform = "rotate(" + properties["RotationAngle"] + "deg)"
 }
 
 //------ Step # 1 : uploading Image Functionality ------- // 
@@ -43,11 +50,6 @@ chooseFileButton.addEventListener("click",() =>
 })
 fileInputDioBox.addEventListener("change",(event) =>
 {
-    // ---> { Steps } <--- 
-    // 1.check for none zero files array
-    // 2. get image file from file input diolog box
-    // 3. load file in preview image src
-
     let newImg = event.target.files[0];
     if (newImg == null)
     {
@@ -55,6 +57,7 @@ fileInputDioBox.addEventListener("change",(event) =>
         return;
     }
     previewImg.src = URL.createObjectURL(newImg);
+    resetProperties();
 })
 
 
@@ -62,10 +65,14 @@ fileInputDioBox.addEventListener("change",(event) =>
 // --------- Slider Functions ------------// 
 function changeSliderHeadings(heading,value)
 {
-    filterName.innerText = heading;
-    filterValue.innerText = value + "%";
+    if (heading != "none")
+    {
+        filterName.innerText = heading;
+        filterValue.innerText = value + "%";
+        slider.value = value;
+    }
 }
-slider.addEventListener("click",(event) =>
+slider.addEventListener("click",() =>
 {
 
     if (activeProperty === "none")
@@ -78,7 +85,9 @@ slider.addEventListener("click",(event) =>
     updateImgColorProperties()
 
 })
-// ==================== > Color Grading Options Options  < ===============  //
+
+// ==================== > Color Grading Options < ===============  //
+
 editingOptions.forEach((element) =>
 {
     element.addEventListener("click",() =>
@@ -86,6 +95,50 @@ editingOptions.forEach((element) =>
         let property = String(element.innerText);
         activeProperty = property
         changeSliderHeadings(property,properties[property]);
-        slider.value = properties[property];
+
     })
 });
+// ====================== Rotational Function ===================//
+rotationalOptions.forEach((element) =>
+{
+    element.addEventListener("click",() =>
+    {
+        if (element.id === "left")
+        {
+            properties["RotationAngle"] -= 15;
+        } else if (element.id === "right")
+        {
+            properties["RotationAngle"] += 15;
+        } else if (element.id === "horizontal")
+        {
+            if (properties["RotationAngle"] != 90)
+            {
+                properties["RotationAngle"] = 90;
+            }
+            else
+            {
+                properties["RotationAngle"] = 270
+            }
+        }
+        else if (element.id === "vertical")
+        {
+
+            if (properties["RotationAngle"] != 0)
+            {
+                properties["RotationAngle"] = 0;
+            }
+            else
+            {
+                properties["RotationAngle"] = 180;
+            }
+        }
+        updateImgColorProperties();
+    })
+})
+// =================== Reset Function ==================//
+resetBtn.addEventListener("click",() =>
+{
+    console.log("Values Has been Reset To orignal State")
+    resetProperties();
+})
+// ================== Downloading Img =================//

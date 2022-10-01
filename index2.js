@@ -160,4 +160,4 @@ mirrorBtn.addEventListener("click",() =>
 resetBtn.addEventListener("click",() =>
 {
     previewImg.resetFilters();
-})  
+})
