@@ -1,164 +1,91 @@
-// ============================== Classes =========================== //
-class PreviewImg
-{
-    constructor()
-    {
-        this.rotationAngle = 0;
-        this.brightness = 100;
-        this.saturation = 100;
-        this.grayscale = 0;
-        this.invation = 0;
-        this.image = document.querySelector(".preview-img img");
-
-    }
-    resetFilters()
-    {
-        this.rotationAngle = 0;
-        this.brightness = 100;
-        this.saturation = 100;
-        this.grayscale = 0;
-        this.invation = 0;
-        this.updateImgProperties();
-
-    }
-    updateImgProperties()
-    {
-        let filterString = "brightness(" + this.brightness + "%) saturate(" + this.saturation + "%) grayscale(" + this.grayscale + "%) invert(" + this.invation + "%)"
-        document.querySelector(".preview-img img").style.filter = filterString;
-        this.image.style.transform = "rotate(" + this.rotationAngle + "deg)"
-    }
-    updateImg(newURL)
-    {
-        this.image.src = newURL;
-    }
-    changePropertyValue(property,value)
-    {
-        if (property === "brightness")
-        {
-            this.brightness = value;
-        }
-        else if (property === "saturation")
-        {
-            this.saturation = value;
-        }
-        else if (property === "grayscale")
-        {
-            this.grayscale = value;
-        }
-        else if (property === "inversion")
-        {
-            this.invation = value
-        }
-        this.updateImgProperties();
-    }
-    clockwiseRotate()
-    {
-        this.rotationAngle += 90;
-        this.updateImgProperties()
-    }
-    anticlockWiseRotate()
-    {
-        this.rotationAngle -= 90;
-        this.updateImgProperties()
-
-    }
-    upsideDownRoate()
-    {
-        this.rotationAngle += 180;
-        this.updateImgProperties();
-    }
-}
-
-var previewImg = new PreviewImg();
+// Document Components Selection
+let previewImg = document.querySelector(".preview-img img");
 let fileInputDioBox = document.querySelector(".file-input");
 let chooseFileButton = document.querySelector(".choose-img");
-// ============ Edidting Buttons ======================= /
-let brightnessBtn = document.querySelector("#brightness");
-let saturationBtn = document.querySelector("#saturation");
-let greyscaleBtn = document.querySelector("#grayscale");
-let inversionBtn = document.querySelector("#inversion");
+
+let editingOptions = document.querySelectorAll(".options button")
+
+
 let resetBtn = document.querySelector(".reset-filter")
-// rotation Btns
 let antiClockRotateBtn = document.querySelector("#left");
 let clockRotateBtn = document.querySelector("#right");
 let upsideDownRotateBtn = document.querySelector("#vertical");
 let mirrorBtn = document.querySelector("#horizontal");
 
+// ---------------- Slider Selection ------------------/
 let slider = document.querySelector(".slider input")
 let filterName = document.querySelector(".filter-info .name");
 let filterValue = document.querySelector(".filter-info .value");
 
+// ---------------- Initial Values of Image
+let image = document.querySelector(".preview-img img");
+let activeProperty = "none";
 
-// ==================== Event Handler ====================== //
+let properties = {
+    "Brightness": 100,
+    "Saturation": 100,
+    "Grayscale": 0,
+    "Inversion": 0,
+    "RotationAngle": 0
+}
+// Changing Image Properties
 
-fileInputDioBox.addEventListener("change",(event) =>
+function updateImgColorProperties()
 {
-    let newImgFile = event.target.files[0];
-    if (newImgFile != null)
-    {
-        console.log("After this functon should bind")
-        previewImg.updateImg(URL.createObjectURL(newImgFile))
-    }
-})
+    let filterString = "brightness(" + properties["Brightness"] + "%) saturate(" + properties["Saturation"] + "%) grayscale(" + properties["Grayscale"] + "%) invert(" + properties["Inversion"] + "%)"
+    document.querySelector(".preview-img img").style.filter = filterString;
+}
 
+//------ Step # 1 : uploading Image Functionality ------- // 
 chooseFileButton.addEventListener("click",() =>
 {
-    fileInputDioBox.click();
+    fileInputDioBox.click(); // This is going to call click functionality of dialog box
+})
+fileInputDioBox.addEventListener("change",(event) =>
+{
+    // ---> { Steps } <--- 
+    // 1.check for none zero files array
+    // 2. get image file from file input diolog box
+    // 3. load file in preview image src
+
+    let newImg = event.target.files[0];
+    if (newImg == null)
+    {
+        console.log("Dialog Box was opened but No Img was loaded")
+        return;
+    }
+    previewImg.src = URL.createObjectURL(newImg);
 })
 
-// ------------ Editing Buttons ------------------/
-brightnessBtn.addEventListener("click",() =>
-{
-    filterName.innerHTML = "Brightness"
-    slider.value = previewImg.brightness
-    filterValue.innerHTML = slider.value + "%";
-})
-saturationBtn.addEventListener("click",() =>
-{
-    filterName.innerHTML = "Saturation"
-    slider.value = previewImg.saturation
-    filterValue.innerHTML = slider.value + "%";
-})
-greyscaleBtn.addEventListener("click",() =>
-{
-    filterName.innerHTML = "Grayscale"
-    slider.value = previewImg.grayscale
-    filterValue.innerHTML = slider.value + "%";
-})
-inversionBtn.addEventListener("click",() =>
-{
-    filterName.innerHTML = "Inversion"
-    slider.value = previewImg.invation
-    filterValue.innerHTML = slider.value + "%";
-})
-slider.addEventListener("click",() =>
-{
-    let sliderValue = slider.value;
-    console.log("Slider Value : " + sliderValue)
-    filterValue.innerHTML = sliderValue + "%";
-    console.log(String(filterName.innerHTML).toLowerCase(),"   ",parseInt(sliderValue))
-    previewImg.changePropertyValue(String(filterName.innerHTML).toLowerCase(),parseInt(sliderValue));
-})
 
-// ============== Rotation Buttons ================= //
+// ============ Editing Photo Implementation =============== //
+// --------- Slider Functions ------------// 
+function changeSliderHeadings(heading,value)
+{
+    filterName.innerText = heading;
+    filterValue.innerText = value + "%";
+}
+slider.addEventListener("click",(event) =>
+{
 
-antiClockRotateBtn.addEventListener("click",() =>
-{
-    previewImg.anticlockWiseRotate();
+    if (activeProperty === "none")
+    {
+        console.log("No Property selected");
+        return;
+    }
+    properties[activeProperty] = slider.value
+    changeSliderHeadings(activeProperty,properties[activeProperty])
+    updateImgColorProperties()
+
 })
-clockRotateBtn.addEventListener("click",() =>
+// ==================== > Color Grading Options Options  < ===============  //
+editingOptions.forEach((element) =>
 {
-    previewImg.clockwiseRotate();
-})
-upsideDownRotateBtn.addEventListener("click",() =>
-{
-    previewImg.upsideDownRoate();
-})
-mirrorBtn.addEventListener("click",() =>
-{
-    console.log("Mirror Rotate")
-})
-resetBtn.addEventListener("click",() =>
-{
-    previewImg.resetFilters();
-})  
+    element.addEventListener("click",() =>
+    {
+        let property = String(element.innerText);
+        activeProperty = property
+        changeSliderHeadings(property,properties[property]);
+        slider.value = properties[property];
+    })
+});
