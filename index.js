@@ -140,7 +140,8 @@ slider.addEventListener("click",() =>
     previewImg.changePropertyValue(String(filterName.innerHTML).toLowerCase(),parseInt(sliderValue));
 })
 
-// Rotation Buttons
+// ============== Rotation Buttons ================= //
+
 antiClockRotateBtn.addEventListener("click",() =>
 {
     previewImg.anticlockWiseRotate();
@@ -157,9 +158,7 @@ mirrorBtn.addEventListener("click",() =>
 {
     console.log("Mirror Rotate")
 })
-// 
 resetBtn.addEventListener("click",() =>
 {
     previewImg.resetFilters();
-})
-
+})  
