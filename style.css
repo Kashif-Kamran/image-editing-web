@@ -91,6 +91,7 @@ body {
 
 .filter .slider {
   margin-top: 12px;
+  width: 100%;
 }
 
 .filter .slider .filter-info {

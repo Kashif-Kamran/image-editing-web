@@ -22,6 +22,8 @@ let properties = {
     "Grayscale": 0,
     "Inversion": 0,
     "RotationAngle": 0,
+    "Blur": 0,
+    "Sepia": 0
 
 }
 function resetProperties()
@@ -31,14 +33,35 @@ function resetProperties()
     properties["Grayscale"] = 0;
     properties["Inversion"] = 0;
     properties["RotationAngle"] = 0;
+    properties["Blur"] = 0;
+    properties["Sepia"] = 0;
+
+    document.querySelectorAll(".advance input").forEach((element) =>
+    {
+        elementId = element.id;
+        if (elementId === "blur-slider")
+        {
+            element.value = properties["Blur"];
+        }
+        else if (elementId === "rotate-slider")
+        {
+            element.value = properties["RotationAngle"];
+        }
+        else if (elementId === "sepia-slider")
+        {
+            element.value = properties["Sepia"];
+        }
+    });
     changeSliderHeadings(activeProperty,properties[activeProperty])
+    updateAdvanceSlidersHeadings()
     updateImgColorProperties()
+
 }
 // Changing Image Properties
 
 function updateImgColorProperties()
 {
-    let filterString = "brightness(" + properties["Brightness"] + "%) saturate(" + properties["Saturation"] + "%) grayscale(" + properties["Grayscale"] + "%) invert(" + properties["Inversion"] + "%)"
+    let filterString = "brightness(" + properties["Brightness"] + "%) saturate(" + properties["Saturation"] + "%) grayscale(" + properties["Grayscale"] + "%) invert(" + properties["Inversion"] + "%) blur(" + properties["Blur"] + "px) sepia(" + properties["Sepia"] + "%)"
     previewImg.style.filter = filterString;
     previewImg.style.transform = "rotate(" + properties["RotationAngle"] + "deg)"
 }
@@ -83,8 +106,19 @@ slider.addEventListener("click",() =>
     properties[activeProperty] = slider.value
     changeSliderHeadings(activeProperty,properties[activeProperty])
     updateImgColorProperties()
-
 })
+function updateAdvanceSlidersHeadings()
+{
+    let blurSliderValue = document.querySelector("#blur-div .value");
+    let rotateSliderValue = document.querySelector("#rotate-div .value");
+    let sepiaSliderValue = document.querySelector("#sepia-div .value");
+
+    blurSliderValue.innerText = properties["Blur"] + "%";
+    rotateSliderValue.innerText = properties["RotationAngle"] + "deg";
+    sepiaSliderValue.innerText = properties["Sepia"] + "%";
+
+
+}
 
 // ==================== > Color Grading Options < ===============  //
 
@@ -105,10 +139,10 @@ rotationalOptions.forEach((element) =>
     {
         if (element.id === "left")
         {
-            properties["RotationAngle"] -= 15;
+            properties["RotationAngle"] -= 45;
         } else if (element.id === "right")
         {
-            properties["RotationAngle"] += 15;
+            properties["RotationAngle"] += 45;
         } else if (element.id === "horizontal")
         {
             if (properties["RotationAngle"] != 90)
@@ -142,3 +176,32 @@ resetBtn.addEventListener("click",() =>
     resetProperties();
 })
 // ================== Downloading Img =================//
+
+
+
+// =============== Part B attributes ============= //
+document.querySelectorAll(".advance input").forEach((element) =>
+{
+    element.addEventListener("click",() =>
+    {
+        elementId = element.id;
+        if (elementId === "blur-slider")
+        {
+            properties["Blur"] = element.value;
+        }
+        else if (elementId === "rotate-slider")
+        {
+            properties["RotationAngle"] = element.value;
+        }
+        else if (elementId === "sepia-slider")
+        {
+            properties["Sepia"] = element.value;
+        }
+        updateImgColorProperties();
+        updateAdvanceSlidersHeadings();
+    })
+
+})
+// Download Img Functionality
+// Taken from Vedio 
+
